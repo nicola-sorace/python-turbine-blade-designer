@@ -1,2 +1,3 @@
-blade_design.csv
-*_BKUP_*
+**/__pycache__
+.idea
+

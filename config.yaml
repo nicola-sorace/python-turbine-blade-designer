@@ -1,0 +1,38 @@
+# All values in base SI units, angles in degrees
+
+# Fluid properties
+free_stream_velocity: 10.0
+fluid_density: 1.225
+dynamic_viscosity: 16.82e-6
+
+# Optimization targets
+target_power: 1.0e+3
+expected_efficiency: 0.225 # 0.3 (aerodynamics) * 0.75 (electrical)
+tip_speed_ratio: 5.0
+
+# Blade configuration
+blade_count: 3
+slice_count: 30
+sections:
+  # Begin with a circular stem
+  - start_r: 0.1
+    end_r: 0.2
+    airfoil: circle
+    angle_of_attack: 5
+    forced_chord: 0.06
+    single_slice: True
+    straight_to_next: True
+    thickness: 1
+  # A thick symmetrical airfoil near the base, for extra strength
+  - start_r: 0.3
+    airfoil: NACA0018
+    angle_of_attack: 5
+    thickness: 0.18
+  # Gradually move to a thinner, more efficient airfoil; but start with lower
+  # angle-of-attack than optimal, to reduce forces
+  - start_r: 0.6
+    airfoil: NACA4418
+    angle_of_attack: 2.5
+  # Gradually transition towards optimal angle-of-attack near the tip
+  - airfoil: NACA4418
+    angle_of_attack: 6.5
