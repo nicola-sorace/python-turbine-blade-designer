@@ -4,18 +4,39 @@ This is a Python project to design optimized wind turbine blade geometry, using 
 It is based on the approach described in [this paper](https://grantingram.org/download/wind_turbine_design.pdf) by [Grant Ingram](https://grantingram.org/).
 
 ## Dependencies
-
 Requires Python 3.10 with these libraries:
-
 - `PyYaml`
 - `numpy`
 - `pandas`
 - [build123d](https://github.com/gumyr/build123d)
 
 ## Configuration
+Parameters controlling the optimization process can be modified in `config.yaml`.
+These include:
+
+### Environment
+- `free_stream_velocity`: Velocity of the incoming wind ($m.s^{-1}$)
+- `fluid_density`: Density of the fluid ($kg.m^{-3}$)
+- `dynamic_viscosity`: Dynamic viscosity of the fluid ($Pa.s$)
+
+### Optimization targets
+- `target_power`: Desired amount of electrical power ($W$)
+- `expected_efficiency`: Total energy losses to account for (fraction)
+- `tip_speed_ratio`: Target ratio of tangential tip speed vs incoming wind speed (ratio)
+
+### Blade properties
+- `blade_count`: Number of blades in the turbine (`int`)
+- `slice_count`: Number of discrete slices for the blade element method (`int`)
+- `sections`: Properties of the blade, defined in sections along its length. Properties will be linearly interpolated between sections.
+  - `start_r`: Starting distance from the central axis ($m$) - defaults to end of the blade
+  - `end_r`: Ending distance from the central axis ($m$) - defaults to starting distance
+  - `airfoil`: Name of the airfoil profile to use, e.g. `NACA0018` (`str`)
+  - `angle_of_attack`: Target angle of attack for the airfoil (degrees)
+  - `forced_chord`: Optionally force a chord length, instead of optimizing ($m$)
+  - `single_slice`: Forces this section to consist of a single slice (`bool`)
+  - `straight_to_next`: Forces *next* section to consist of a single slice (`bool`)
 
 ## Usage
-
 Once the `config.yaml` file is ready, generate the blade geometry by running `main.py`:
 ```bash
 python main.py
@@ -23,9 +44,9 @@ python main.py
 
 This will produce the following files into the `output` folder:
 
+- `blade.step` and `blade.stl`: CAD representations of the optimized blade.
 - `geometry.csv` - The calculated properties of the optimized turbine blade, for each discretized slice: twist, chord length, etc.
 - `forces.csv` - An estimate of the radial and axial forces experienced at each slice of the blade, under design conditions.
-- `blade.step` and `blade.stl`: CAD representations of the optimized blade.
 
 Additionally, the following values are outputted to `stdout`:
 - Blade radius
