@@ -74,12 +74,12 @@ def optimize_blade(
             np.pi * environment.free_stream_velocity**3
         )
     )
-    print(f"Blade radius: {final_r:.2f}m")
+    print(f" - Blade radius: {final_r:.2f}m")
     # Calculate resulting properties
     angular_velocity = (tip_speed_ratio * environment.free_stream_velocity / final_r)
     rpm = 60 * angular_velocity / (2 * np.pi)
     torque = target_power / angular_velocity
-    print(f"Blade should spin at {rpm:.0f}RPM, with a generator torque of {torque:.2f}Nm")
+    print(f" - Blade should spin at {rpm:.0f}RPM, with a generator torque of {torque:.2f}Nm")
 
     # Split blade into slices of equal length
     rs = np.linspace(blade.sections[0].start_r, final_r, blade.num_slices)
@@ -93,19 +93,6 @@ def optimize_blade(
     for r in forced_lengths:
         i = np.argmin(np.abs(rs - r))
         rs[i] = r
-    # Remove unwanted slices
-    for i, section in enumerate(blade.sections):
-        if section.single_slice:
-            rs = rs[
-                (rs <= section.start_r) |
-                (rs >= section.end_r)
-            ]
-        if section.straight_to_next:
-            rs = rs[
-                (rs <= section.end_r) |
-                (rs >= blade.sections[i + 1].start_r)
-            ]
-    blade.num_slices = len(rs)
 
     # Generate a list of interpolated section indices for each slice
     # (for example, a slice midway between section 1 and 2 is 1.5)
@@ -207,16 +194,16 @@ def optimize_blade(
         tip_loss_correction = 2/np.pi * np.arccos(np.exp(frac))
 
         frac = (
-                solidities *
-                (lift_coefficients * np.sin(twists) + drag_coefficients * np.cos(twists)) /
-                (4 * tip_loss_correction * np.cos(twists)**2)
+            solidities *
+            (lift_coefficients * np.sin(twists) + drag_coefficients * np.cos(twists)) /
+            (4 * tip_loss_correction * np.cos(twists)**2)
         )
         axial_inductions = frac / (1 + frac)
 
         frac = (
-                solidities *
-                (lift_coefficients * np.cos(twists) - drag_coefficients * np.sin(twists)) /
-                (4 * tip_loss_correction * np.cos(twists)**2)
+            solidities *
+            (lift_coefficients * np.cos(twists) - drag_coefficients * np.sin(twists)) /
+            (4 * tip_loss_correction * np.cos(twists)**2)
         )
         radial_inductions = frac * (1 - axial_inductions)
 
@@ -227,14 +214,6 @@ def optimize_blade(
             break
         elif i == ITERATION_LIMIT - 1:
             warnings.warn(f"Failed to converge after {ITERATION_LIMIT} iterations")
-
-    # Apply any optimization overrides for each section
-    for section in blade.sections:
-        if section.forced_chord is not None:
-            chords[
-                (rs >= section.start_r) &
-                (rs <= section.end_r)
-            ] = section.forced_chord
 
     return pd.DataFrame(
         {

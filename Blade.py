@@ -10,8 +10,8 @@ from estimate_forces import estimate_blade_forces
 
 FOILS_PATH = "foil_data"
 
-# Value to subtract from airfoil x-axis coordinates
-CENTER_X_OFFSET = 0.3
+# Point of rotation for airfoil twist
+ROTATION_ORIGIN = (0.3, 0.0)
 
 
 @dataclass
@@ -19,6 +19,13 @@ class Environment:
     free_stream_velocity: float
     fluid_density: float
     dynamic_viscosity: float
+
+
+@dataclass
+class BladeStem:
+    start: float
+    length: float
+    diameter: float
 
 
 @dataclass
@@ -33,15 +40,6 @@ class BladeSection:
     airfoil_name: str
     # Target angle of attack
     angle_deg: float
-    # Optionally force a chord
-    # (this requires `end_r`, and will interpolate to next section)
-    forced_chord: Optional[float]
-    # If true, prevent slicing within this section
-    single_slice: bool
-    # If true, prevent slicing between this section and the next
-    straight_to_next: bool
-    # Specify airfoil thickness, for force calculations
-    thickness: Optional[float]
 
     def __post_init__(self):
         if self.airfoil_name not in self.blade.airfoil_stats:
@@ -54,8 +52,8 @@ class BladeSection:
             df = pd.read_csv(
                 os.path.join(FOILS_PATH, self.airfoil_name, 'shape.csv'),
             )
-            df.x = df.x - CENTER_X_OFFSET
-            df.y = -df.y
+            df.x = df.x - ROTATION_ORIGIN[0]
+            df.y = -df.y - ROTATION_ORIGIN[1]
             self.blade.airfoil_shapes[self.airfoil_name] = df.to_numpy()
 
     @property
@@ -66,6 +64,7 @@ class BladeSection:
 class Blade:
     def __init__(
             self,
+            stem: BladeStem,
             sections: list[dict],
             environment: Environment,
             target_power: float,
@@ -79,6 +78,7 @@ class Blade:
         # Cached dictionary of airfoil shape, as lists of 2D coordinates
         self.airfoil_shapes = {}  # airfoil_name -> np.array[n, 2]
 
+        self.stem = stem
         self.sections = [
             BladeSection(self, **section)
             for section in sections
@@ -99,8 +99,8 @@ class Blade:
             blade_count
         )
 
-    def build_shape(self) -> Part:
-        return build_blade_shape(self)
+    def build_shape(self, hollow_thickness, hollow_min_chord) -> Part:
+        return build_blade_shape(self, hollow_thickness, hollow_min_chord)
 
     def estimate_forces(
             self,

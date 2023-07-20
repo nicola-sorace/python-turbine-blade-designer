@@ -32,9 +32,15 @@ These include:
   - `end_r`: Ending distance from the central axis ($m$) - defaults to starting distance
   - `airfoil`: Name of the airfoil profile to use, e.g. `NACA0018` (`str`)
   - `angle_of_attack`: Target angle of attack for the airfoil (degrees)
-  - `forced_chord`: Optionally force a chord length, instead of optimizing ($m$)
-  - `single_slice`: Forces this section to consist of a single slice (`bool`)
-  - `straight_to_next`: Forces *next* section to consist of a single slice (`bool`)
+- `stem`: Options regarding the blade stem
+  - `start`: Distance from rotation origin at which stem starts ($m$)
+  - `length`: Length of the stem ($m$)
+  - `diameter`: Diameter of the stem ($m$)
+
+### Hollow geometry
+- `hollow`: Optionally make the blade hollow (set to `{}` for solid blade)
+  - `thickness`: Hollow shell thickness ($m$)
+  - `min_chord`: Minimum chord length below which blade will become solid
 
 ## Usage
 Once the `config.yaml` file is ready, generate the blade geometry by running `main.py`:

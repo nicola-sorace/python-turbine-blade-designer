@@ -7,7 +7,7 @@ Note the confusing distinction between "section" and "slice":
 
 import os
 import yaml
-from Blade import Blade, Environment
+from Blade import Blade, Environment, BladeStem
 
 output_dir = "output"
 
@@ -15,17 +15,19 @@ if __name__ == '__main__':
     with open("config.yaml") as f:
         config = yaml.safe_load(f.read())
 
+    print("Finding optimal blade shape...")
     blade = Blade(
+        stem=BladeStem(
+            start=config['stem']['start'],
+            length=config['stem']['length'],
+            diameter=config['stem']['diameter']
+        ),
         sections=[
             {
                 'start_r': section.get('start_r'),
                 'end_r': section.get('end_r'),
                 'airfoil_name': section['airfoil'],
-                'angle_deg': section['angle_of_attack'],
-                'forced_chord': section.get('forced_chord'),
-                'single_slice': section.get('single_slice', False),
-                'straight_to_next': section.get('straight_to_next', False),
-                'thickness': section.get('thickness')
+                'angle_deg': section['angle_of_attack']
             }
             for section in config['sections']
         ],
@@ -44,21 +46,25 @@ if __name__ == '__main__':
         num_slices=config['slice_count']
     )
 
-    # Export optimized geometry values
+    print("Exporting optimized parameters...")
     (
         blade
         .slices
         .to_csv(os.path.join(output_dir, "geometry.csv"))
     )
 
-    # Calculate and export estimated forecs
+    print("Calculate and export estimated forces...")
     (
         blade
         .estimate_forces()
         .to_csv(os.path.join(output_dir, "forces.csv"))
     )
 
-    # Generate shape and export as STEP and STL
-    shape = blade.build_shape()
+    print("Generate and export geometry...")
+    shape = blade.build_shape(
+        config.get('hollow', {}).get('thickness'),
+        config.get('hollow', {}).get('min_chord'),
+    )
     shape.export_step(os.path.join(output_dir, "blade.step"))
     shape.export_stl(os.path.join(output_dir, "blade.stl"))
+    print("Done")

@@ -45,9 +45,9 @@ def estimate_blade_forces(
     turning_torque = np.sum(radial_forces * rs)
     bending_torque = np.sum(axial_forces * rs)
 
-    print(f"Total drag force: {drag_force}")
-    print(f"Total turning torque: {turning_torque}")
-    print(f"Total bending torque: {bending_torque}")
+    print(f" - Total drag force: {drag_force:.2f}N")
+    print(f" - Total turning torque: {turning_torque:.2f}Nm")
+    print(f" - Total bending torque: {bending_torque:.2f}Nm")
 
     return pd.DataFrame({
         'radius': rs,
