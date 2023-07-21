@@ -8,6 +8,7 @@ Note the confusing distinction between "section" and "slice":
 import os
 import yaml
 from Blade import Blade, Environment, BladeStem
+from plots import draw_plots
 
 output_dir = "output"
 
@@ -47,18 +48,12 @@ if __name__ == '__main__':
     )
 
     print("Exporting optimized parameters...")
-    (
-        blade
-        .slices
-        .to_csv(os.path.join(output_dir, "geometry.csv"))
-    )
+    df_shape = blade.slices
+    df_shape.to_csv(os.path.join(output_dir, "geometry.csv"))
 
     print("Calculate and export estimated forces...")
-    (
-        blade
-        .estimate_forces()
-        .to_csv(os.path.join(output_dir, "forces.csv"))
-    )
+    df_forces = blade.estimate_forces()
+    df_forces.to_csv(os.path.join(output_dir, "forces.csv"))
 
     print("Generate and export geometry...")
     shape = blade.build_shape(
@@ -67,4 +62,8 @@ if __name__ == '__main__':
     )
     shape.export_step(os.path.join(output_dir, "blade.step"))
     shape.export_stl(os.path.join(output_dir, "blade.stl"))
+
+    print("Generating plots...")
+    draw_plots(blade, df_shape, df_forces, output_dir)
+
     print("Done")
