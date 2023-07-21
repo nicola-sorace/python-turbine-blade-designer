@@ -3,12 +3,20 @@ This is a Python project to design optimized wind turbine blade geometry, using 
 
 It is based on the approach described in [this paper](https://grantingram.org/download/wind_turbine_design.pdf) by [Grant Ingram](https://grantingram.org/).
 
-Default blade shape:
+### Default blade shape
+
+Render:
+
 ![Render of default blade shape](img/turntable.gif)
-Photo of a 3d-printed blade mould (the base was manually smoothed out in [Blender](https://www.blender.org/)):
-![Photo of default blade shape](img/photo.jpg)
+
+Photo of a 3d-printed blade mould
+(the base was manually smoothed out in [Blender](https://www.blender.org/)):
+
+<img src="img/photo.jpg" width=300px>
+
 Output plots:
-![Graph of blade properties](img/plots.svg)
+
+<img src="img/plots.svg" width=500px>
 
 ## Dependencies
 Requires Python 3.10 with these libraries:
