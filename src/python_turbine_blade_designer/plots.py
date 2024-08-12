@@ -8,11 +8,10 @@ try:
     sns.set_theme()
 except ImportError:
     print("Install Seaborn for prettier plots")
-from Blade import Blade
 
 
 def draw_plots(
-        blade: Blade,
+        blade: 'Blade',
         df_shape: pd.DataFrame,
         df_forces: pd.DataFrame,
         output_dir: str

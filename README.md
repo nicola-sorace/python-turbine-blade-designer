@@ -60,12 +60,13 @@ These include:
   - `min_chord`: Minimum chord length below which blade will become solid
 
 ## Usage
-Once the `config.yaml` file is ready, generate the blade geometry by running `main.py`:
+Install with `pip`, then pass a YAML config file and an output folder:
 ```bash
-python main.py
+python -m pip install .
+python -m python_turbine_blade_designer --input config.yaml --output output
 ```
 
-This will produce the following files into the `output` folder:
+This will produce the following files into the output folder:
 
 - `blade.step` and `blade.stl`: CAD representations of the optimized blade.
 - `geometry.csv` - The calculated properties of the optimized turbine blade, for each discretized slice: twist, chord length, etc.
@@ -76,5 +77,7 @@ Additionally, the following values are outputted to `stdout`:
 - Ideal rotational velocity and torque (after losses)
 - Expected drag force, torque, and bending torque (before losses)
 
-> The `Blade.estimate_forces()` function can be called with an optional `Environment` parameter.
+And plots of this data are displayed.
+
+> The `Blade.estimate_forces()` function can be called manually, with an optional `Environment` parameter.
 > This allows calculating performance values at conditions outside the design environment.
